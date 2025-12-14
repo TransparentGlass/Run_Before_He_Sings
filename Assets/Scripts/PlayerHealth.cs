@@ -7,18 +7,26 @@ public class PlayerHealth : MonoBehaviour
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
-public System.Action OnHealthChanged;
+    private GameManager gm;
 
+    public System.Action OnHealthChanged;
 
     void Awake()
     {
         currentHealth = maxHealth;
+
+        // Find the GameManager in the scene automatically
+        gm = FindObjectOfType<GameManager>();
+        if (gm == null)
+        {
+            Debug.LogError("GameManager not found in the scene!");
+        }
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-    OnHealthChanged?.Invoke();
+        OnHealthChanged?.Invoke();
 
         Debug.Log("Player HP: " + currentHealth);
 
@@ -31,6 +39,10 @@ public System.Action OnHealthChanged;
     void Die()
     {
         Debug.Log("Player died");
-        // TODO: restart level, show game over, etc.
+
+        if (gm != null)
+        {
+            gm.GameOver();
+        }
     }
 }

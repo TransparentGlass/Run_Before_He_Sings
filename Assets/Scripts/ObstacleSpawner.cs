@@ -9,6 +9,8 @@ public class ObstacleSpawner : MonoBehaviour
 {
 
     public GameObject[] obstaclePrefabs;
+    [SerializeField] private Transform ground; // assign your ground in inspector
+
     float minDelay = 1.5f;
     float maxDelay = 3f;
     float Obstacle_timer;
@@ -63,18 +65,34 @@ public class ObstacleSpawner : MonoBehaviour
         }
     }
 
+
     void Spawn()
     {
         GameObject prefab = GetRandomObstacle();
-
         GameObject go = Instantiate(prefab);
 
+        // Get obstacle height offset
+        SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
+        float yOffset = 0f;
+        if (sr != null)
+        {
+            yOffset = sr.bounds.size.y / 2; // half the obstacle height
+        }
+
+        // Get top of ground
+        Collider2D groundCollider = ground.GetComponent<Collider2D>();
+        float groundTop = ground.position.y;
+        if (groundCollider != null)
+            groundTop = groundCollider.bounds.max.y; // top edge of the ground
+
+        // Place obstacle so its bottom aligns with ground top
         go.transform.position = new Vector3(
             right + 5f,
-            bottom_map,
+            groundTop + yOffset, // bottom of obstacle sits on top of ground
             0f
         );
     }
+
 
 
 

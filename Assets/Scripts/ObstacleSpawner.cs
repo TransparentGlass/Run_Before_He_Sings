@@ -8,7 +8,7 @@ using Unity;
 public class ObstacleSpawner : MonoBehaviour
 {
 
-    public Obstacle[] obstacles;
+    public GameObject[] obstaclePrefabs;
     float minDelay = 1.5f;
     float maxDelay = 3f;
     float Obstacle_timer;
@@ -19,6 +19,9 @@ public class ObstacleSpawner : MonoBehaviour
     float width;
     float right;
     float bottom_map;
+
+    [SerializeField] public static float speed = 5f;
+    [SerializeField] public static float acceleration = 1.2f;
     void Awake()
     {
         game_timer = 0f;
@@ -26,6 +29,20 @@ public class ObstacleSpawner : MonoBehaviour
 
 
     void Start()
+    {
+
+
+        nextSpawn = Random.Range(minDelay, maxDelay);
+
+    }
+
+    public GameObject GetRandomObstacle()
+    {
+        int index = Random.Range(0, obstaclePrefabs.Length);
+        return obstaclePrefabs[index];
+    }
+
+    void Update()
     {
         Camera cam = Camera.main;
         Vector3 camPos = cam.transform.position;
@@ -35,22 +52,8 @@ public class ObstacleSpawner : MonoBehaviour
         right = camPos.x + width / 2;
         bottom_map = (float)-2.561;
 
-        nextSpawn = Random.Range(minDelay, maxDelay);
-
-    }
-
-    public Obstacle GetRandomObstacle()
-    {
-        int index = Random.Range(0, obstacles.Length);
-        return obstacles[index];
-    }
-
-    void Update()
-    {
-
         Obstacle_timer += Time.deltaTime;
         game_timer += Time.deltaTime;
-
 
         if (Obstacle_timer >= nextSpawn)
         {
@@ -62,22 +65,15 @@ public class ObstacleSpawner : MonoBehaviour
 
     void Spawn()
     {
-        Obstacle obs = GetRandomObstacle();
-        GameObject go = new(obs.name);
-        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = obs.sprite;
-        sr.sortingOrder = 10;
+        GameObject prefab = GetRandomObstacle();
 
-
-
+        GameObject go = Instantiate(prefab);
 
         go.transform.position = new Vector3(
-            right + 5f,     // X
-            bottom_map, // Y
-            0f              // Z
+            right + 5f,
+            bottom_map,
+            0f
         );
-
-        go.AddComponent<ObstacleMover>();
     }
 
 

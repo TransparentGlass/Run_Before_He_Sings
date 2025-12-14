@@ -2,30 +2,32 @@ using UnityEngine;
 
 public class Parallax : MonoBehaviour
 {
-    // private float length, startpos;
-    // public GameObject cam;
-    // public float parallaxEffect;
+    [SerializeField] private Transform cam;
+    [Range(0f, 1f)]
+    [SerializeField] public float parallaxEffect;
+
+    private float length;
+    private float lastCamX;
 
     void Start()
     {
-        // Store the starting X position of this GameObject
-        startpos = transform.position.x;
-        // Get the width of the sprite attached to this GameObject
         length = GetComponent<SpriteRenderer>().bounds.size.x;
+        lastCamX = cam.position.x;
     }
 
-    void Update()
+    void LateUpdate() // IMPORTANT
     {
-        // Calculate temporary offset based on camera movement for looping
-        float temp = (cam.transform.position.x * (1 - parallaxEffect));
-        // Calculate the distance the background should move based on parallax effect
-        float dist = (cam.transform.position.x * parallaxEffect);
+        float deltaX = cam.position.x - lastCamX;
 
-        // Update the position of the background along X-axis
-        transform.position = new Vector3(startpos + dist, transform.position.y, transform.position.z);
+        transform.position += new Vector3(deltaX * parallaxEffect, 0f, 0f);
 
-        // Check if the camera has moved past the sprite's width to loop the background
-        if (temp > startpos + length) startpos += length;
-        else if (temp < startpos - length) startpos -= length;
+        lastCamX = cam.position.x;
+
+        // Looping
+        if (Mathf.Abs(cam.position.x - transform.position.x) >= length)
+        {
+            float offset = (cam.position.x - transform.position.x) > 0 ? length : -length;
+            transform.position += new Vector3(offset, 0f, 0f);
+        }
     }
 }

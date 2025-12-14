@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerDamage : MonoBehaviour
 {
     [SerializeField] private int damage = 1;
+    
 
     private PlayerHealth health;
 

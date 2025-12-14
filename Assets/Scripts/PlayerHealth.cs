@@ -4,6 +4,11 @@ public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private int maxHealth = 3;
     private int currentHealth;
+    public int MaxHealth => maxHealth;
+    public int CurrentHealth => currentHealth;
+
+public System.Action OnHealthChanged;
+
 
     void Awake()
     {
@@ -13,6 +18,8 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
+    OnHealthChanged?.Invoke();
+
         Debug.Log("Player HP: " + currentHealth);
 
         if (currentHealth <= 0)

@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class Parallax : MonoBehaviour
 {
-    private float length, startpos;
-    public GameObject cam;
-    public float parallaxEffect;
+    // private float length, startpos;
+    // public GameObject cam;
+    // public float parallaxEffect;
 
     void Start()
     {

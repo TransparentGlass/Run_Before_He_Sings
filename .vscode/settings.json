@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Run_Before_He_Sings.slnx"
+    "dotnet.defaultSolution": "Run Before He Sings.slnx"
 }

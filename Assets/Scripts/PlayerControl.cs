@@ -9,7 +9,6 @@ public class PlayerControl : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 12f;
-    [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.15f;
     [SerializeField] private LayerMask groundLayer;
 
@@ -23,8 +22,7 @@ public class PlayerControl : MonoBehaviour
 
     void Update()
     {
-        // Ground check
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
+        
 
         // Jump input
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
@@ -40,10 +38,22 @@ public class PlayerControl : MonoBehaviour
         rb.linearVelocity = new Vector2(speed, rb.linearVelocity.y);
     }
 
-    void OnDrawGizmosSelected()
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        if (groundCheck == null) return;
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
+        // Check if the player is on the ground
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        // Check if the player is no longer on the ground
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
     }
 }
+

@@ -1,41 +1,75 @@
-
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Unity;
-
 
 public class ObstacleSpawner : MonoBehaviour
 {
-
+    [Header("Obstacle Settings")]
     public GameObject[] obstaclePrefabs;
     [SerializeField] private Transform ground; // assign your ground in inspector
+    [SerializeField] public static float baseSpeed = 5f;       // starting speed
+    [SerializeField] public static float acceleration = 0.05f; // speed increase per second
+    [SerializeField] private float minDelay = 1.5f;
+    [SerializeField] private float maxDelay = 3f;
 
-    float minDelay = 1.5f;
-    float maxDelay = 3f;
-    float Obstacle_timer;
-    float nextSpawn;
+    private float obstacleTimer;
+    private float nextSpawn;
+
     public static float game_timer { get; private set; }
 
-    float height;
-    float width;
-    float right;
-    float bottom_map;
+    private Camera cam;
+    private float height;
+    private float width;
+    private float rightEdge;
 
-    [SerializeField] public static float speed = 5f;
-    [SerializeField] public static float acceleration = 1.2f;
     void Awake()
     {
         game_timer = 0f;
     }
 
-
     void Start()
     {
-
-
+        cam = Camera.main;
         nextSpawn = Random.Range(minDelay, maxDelay);
+    }
 
+    void Update()
+    {
+        // Update game timer
+        game_timer += Time.deltaTime;
+        obstacleTimer += Time.deltaTime;
+
+        // Update camera bounds
+        height = cam.orthographicSize * 2f;
+        width = height * cam.aspect;
+        rightEdge = cam.transform.position.x + width / 2f;
+
+        // Spawn obstacle if timer reached
+        if (obstacleTimer >= nextSpawn)
+        {
+            obstacleTimer = 0f;
+            nextSpawn = Random.Range(minDelay, maxDelay);
+            Spawn();
+        }
+    }
+
+    void Spawn()
+    {
+        GameObject prefab = GetRandomObstacle();
+        GameObject go = Instantiate(prefab);
+
+        // Get obstacle height offset (pivot at center)
+        SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
+        float yOffset = sr != null ? sr.bounds.size.y / 2f : 0f;
+
+        // Get top of ground
+        Collider2D groundCollider = ground.GetComponent<Collider2D>();
+        float groundTop = groundCollider != null ? groundCollider.bounds.max.y : ground.position.y;
+
+        // Place obstacle so its bottom aligns with ground top
+        go.transform.position = new Vector3(
+            rightEdge + 5f,       // spawn just offscreen
+            groundTop + yOffset,   // align with top of ground
+            0f
+        );
     }
 
     public GameObject GetRandomObstacle()
@@ -43,57 +77,4 @@ public class ObstacleSpawner : MonoBehaviour
         int index = Random.Range(0, obstaclePrefabs.Length);
         return obstaclePrefabs[index];
     }
-
-    void Update()
-    {
-        Camera cam = Camera.main;
-        Vector3 camPos = cam.transform.position;
-
-        height = cam.orthographicSize * 2;
-        width = height * cam.aspect;
-        right = camPos.x + width / 2;
-        bottom_map = (float)-2.561;
-
-        Obstacle_timer += Time.deltaTime;
-        game_timer += Time.deltaTime;
-
-        if (Obstacle_timer >= nextSpawn)
-        {
-            Obstacle_timer = 0f;
-            nextSpawn = Random.Range(minDelay, maxDelay);
-            Spawn();
-        }
-    }
-
-
-    void Spawn()
-    {
-        GameObject prefab = GetRandomObstacle();
-        GameObject go = Instantiate(prefab);
-
-        // Get obstacle height offset
-        SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
-        float yOffset = 0f;
-        if (sr != null)
-        {
-            yOffset = sr.bounds.size.y / 2; // half the obstacle height
-        }
-
-        // Get top of ground
-        Collider2D groundCollider = ground.GetComponent<Collider2D>();
-        float groundTop = ground.position.y;
-        if (groundCollider != null)
-            groundTop = groundCollider.bounds.max.y; // top edge of the ground
-
-        // Place obstacle so its bottom aligns with ground top
-        go.transform.position = new Vector3(
-            right + 5f,
-            groundTop + yOffset, // bottom of obstacle sits on top of ground
-            0f
-        );
-    }
-
-
-
-
 }

@@ -16,7 +16,7 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
 
         // Find the GameManager in the scene automatically
-        gm = FindObjectOfType<GameManager>();
+        gm = FindFirstObjectByType<GameManager>();
         if (gm == null)
         {
             Debug.LogError("GameManager not found in the scene!");

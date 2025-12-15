@@ -10,7 +10,7 @@ public class PlayerControl : MonoBehaviour
     [Header("Jump")]
     [SerializeField] private float jumpForce = 12f;
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundRadius = 0.2f;
+    [SerializeField] private float groundRadius = 0.15f;
     [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody2D rb;
@@ -23,38 +23,26 @@ public class PlayerControl : MonoBehaviour
 
     void Update()
     {
-        // Increase speed over time
-        speed += acceleration * Time.deltaTime;
-
         // Ground check
-        isGrounded = Physics2D.OverlapCircle(
-            groundCheck.position,
-            groundRadius,
-            groundLayer
-        );
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
 
         // Jump input
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
         {
-            Jump();
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
     }
 
     void FixedUpdate()
     {
-        // Move player using physics
+        // Apply horizontal movement with optional acceleration
+        speed += acceleration * Time.fixedDeltaTime;
         rb.linearVelocity = new Vector2(speed, rb.linearVelocity.y);
-    }
-
-    void Jump()
-    {
-        rb.linearVelocity = new Vector2(rb.linearVelocityX, jumpForce);
     }
 
     void OnDrawGizmosSelected()
     {
         if (groundCheck == null) return;
-
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
     }
